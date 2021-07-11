@@ -2,10 +2,10 @@
   <div>
     <c-box m="3">
       <c-heading>Questions</c-heading>
-      <c-button>Add Question</c-button>
       <c-box bg="red.50" v-for="q in questions" :key="q.id">
           {{q.text}}
           <c-button @click="loadQuestion(q)">edit</c-button>
+          <c-button @click="remove(q)">remove</c-button>
           <c-box bg="green.100" p="1" v-for="c in q.choices" :key="c.id">
             {{c.text}}
           </c-box>
@@ -21,7 +21,6 @@
               v-for="choice in question.choices"
               :key="choice.id"
               >
-              {{choice}}
               <c-input
               v-model="choice.text"
               type="text"
@@ -30,6 +29,20 @@
             </c-form-control>
             <c-button @click="save">save</c-button>
           </c-box>
+          <c-box>
+            <c-form-control mt="4">
+              <c-form-label for="question">question</c-form-label>
+              <c-input v-model="question.text" type="text" id="question" />
+            </c-form-control>
+            <c-form-control>
+              <c-form-label for="choices">choices</c-form-label>
+              <div v-for="choice in question.choices" :key="choice.id" >
+                <c-input v-model="choice.text" type="text" id="choices" />
+              </div>
+            </c-form-control>
+            <c-button @click="save">Add Question</c-button>
+          </c-box>
+          {{question}}
     </c-box>
   </div>
 </template>
@@ -60,6 +73,16 @@ export default {
         this.editable = false
         alert('saved succesfuly')
         this.$fetch()
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async remove (question) {
+      const url = `/api/pools/${question.id}`
+      try {
+        await this.$axios.$delete(url)
+        this.$fetch()
+        alert('Item Deleted succesfuly')
       } catch (err) {
         console.log(err)
       }
